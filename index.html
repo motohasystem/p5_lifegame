@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ライフゲーム - はたらく細胞アルゴリズム</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    .description-toggle {
+      margin-top: 1em;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0.5em 1em;
+    }
+    .description {
+      width: 90%;
+      max-width: 700px;
+      font-size: 16px;
+      line-height: 1.8;
+      background: #f9f9f9;
+      padding: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 0.5em;
+      display: none;
+    }
+    .controls {
+      width: 90%;
+      max-width: 700px;
+      margin-top: 1em;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin-top: 1em;
+    }
+    button {
+      margin: 0.2em;
+      padding: 0.5em 1em;
+      font-size: 16px;
+    }
+    .rule-svg {
+      margin: 0.5em 0;
+    }
+  </style>
+</head>
+<body>
+  <button  id="rule-toggle" class="description-toggle" onclick="toggleDescription()">📘 ルールをひらく / とじる</button>
+  <div class="description" id="description"  style="display: none;">
+    <h2>ライフゲームってなに？</h2>
+    <p>
+      ライフゲームは、黒いしかく（いきてる）と、白いしかく（しんでる）でできたゲームです。
+      きまりにしたがって、じぶんでどんどん動いていきます。
+    </p>
+
+    <h3>きまり（ルール）</h3>
+    <p>1つのしかく（マス）のまわりには、8つの「となり」があります。</p>
+
+    <div class="rule-svg">
+      <svg width="150" height="150">
+        <rect x="50" y="50" width="50" height="50" fill="#ffaaaa" />
+        <rect x="0" y="0" width="50" height="50" fill="#ddd" />
+        <rect x="50" y="0" width="50" height="50" fill="#ddd" />
+        <rect x="100" y="0" width="50" height="50" fill="#ddd" />
+        <rect x="0" y="50" width="50" height="50" fill="#ddd" />
+        <rect x="100" y="50" width="50" height="50" fill="#ddd" />
+        <rect x="0" y="100" width="50" height="50" fill="#ddd" />
+        <rect x="50" y="100" width="50" height="50" fill="#ddd" />
+        <rect x="100" y="100" width="50" height="50" fill="#ddd" />
+        <text x="60" y="80" font-size="20">主</text>
+      </svg>
+      <p style="margin-top: 0;">まんなかが「いまのセル」、まわりが「となり」です。</p>
+    </div>
+
+    <h4>① うまれる</h4>
+    <p>しんでいるマスのとなりに、ちょうど3この生きたマスがあると「うまれる」！</p>
+
+    <h4>② いきのこる</h4>
+    <p>いきてるマスのとなりに、2こか3この生きたマスがあると「いきのこる」</p>
+
+    <h4>③ しぬ</h4>
+    <p>となりがすくなすぎたり（1こ以下） or おおすぎたり（4こ以上）すると「しんでしまう」</p>
+
+    <h3>どうやってあそぶの？</h3>
+    <ul>
+      <li>マスをクリック：生きたり死んだり（トグル）</li>
+      <li>ドラッグ：線をひくように生きマスをつくる</li>
+      <li>したのボタン：いろんなパターンをならべて見てみよう！</li>
+      <li>⏸️とめる：動きをとめたり、また動かしたりできるよ</li>
+    </ul>
+  </div>
+
+  <div class="controls">
+    <input type="range" id="cellSizeSlider" min="10" max="30" value="10" />
+    <span id="cellSizeLabel">30</span>
+    <button id="toggle">⏸️ とめる</button>
+    <button onclick="placePattern('glider')">🛸 グライダー</button>
+    <button onclick="placePattern('blinker')">🔁 ブリンカー</button>
+    <button onclick="placePattern('block')">⬛ ブロック</button>
+    <button onclick="placePattern('pulsar')">🌸 パルサー</button>
+    <button onclick="placePattern('lwss')">🚀 LWSS</button>
+    <button onclick="placePattern('glidergun')">🔫 グライダーガン</button>
+    <button onclick="clearField()">🧹 けす</button>
+  </div>
+
+  <!-- キャンバスは p5.js が自動生成 -->
+
+  <script>
+    function toggleDescription() {
+      const desc = document.getElementById("description");
+      desc.style.display = desc.style.display === "none" ? "block" : "none";
+    }
+  </script>
+   <script src="lifegame.js" defer></script>
+</body>
+</html>
