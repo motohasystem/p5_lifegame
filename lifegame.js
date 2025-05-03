@@ -38,6 +38,10 @@ window.addEventListener("DOMContentLoaded", () => {
         let running = true;
         let canvasWidth, canvasHeight;
 
+        // 状態履歴を保持（最大履歴数は100に制限）
+        let history = [];
+        const maxHistory = 100;
+
         p.setup = () => {
             label.textContent = cellSize;
             updateCanvasSize();
@@ -79,7 +83,10 @@ window.addEventListener("DOMContentLoaded", () => {
         p.draw = () => {
             p.background(220);
             drawCells();
-            if (running) nextGeneration();
+            if (running) {
+                saveHistory();
+                nextGeneration();
+            }
         };
 
         function drawCells() {
@@ -92,6 +99,16 @@ window.addEventListener("DOMContentLoaded", () => {
 
         function mod(n, m) {
             return ((n % m) + m) % m;
+        }
+
+        // 履歴に現在の状態を保存
+        function saveHistory() {
+            // Setのコピーを作成
+            const snapshot = new Set(liveCells);
+            history.push(snapshot);
+            if (history.length > maxHistory) {
+                history.shift();
+            }
         }
 
         function nextGeneration() {
@@ -123,6 +140,20 @@ window.addEventListener("DOMContentLoaded", () => {
             }
             liveCells = newLiveCells;
         }
+
+        // ステップ実行用にnextGenerationを外部公開
+        window.stepGeneration = () => {
+            saveHistory();
+            nextGeneration();
+        };
+
+        // 1サイクル戻す関数を外部公開
+        window.previousGeneration = () => {
+            if (history.length === 0) {
+                return;
+            }
+            liveCells = history.pop();
+        };
 
         function toggleCellUnderMouse() {
             let x = Math.floor(p.mouseX / cellSize);
