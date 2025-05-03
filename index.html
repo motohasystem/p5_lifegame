@@ -34,8 +34,10 @@
     }
     .controls {
       width: 90%;
-      max-width: 700px;
       margin-top: 1em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     canvas {
       border: 1px solid #ccc;
@@ -52,7 +54,10 @@
   </style>
 </head>
 <body>
-  <button  id="rule-toggle" class="description-toggle" onclick="toggleDescription()">📘 ルールをひらく / とじる</button>
+  <div style="display: flex; align-items: center; justify-content: center; gap: 1em; margin-top: 0.5em;">
+    <h1 style="font-size: 2em; margin: 0;">🌱 ライフゲーム：はたらく細胞のアルゴリズム</h1>
+    <button id="rule-toggle" class="description-toggle" onclick="toggleDescription()">📘 ルールをひらく / とじる</button>
+  </div>
   <div class="description" id="description"  style="display: none;">
     <h2>ライフゲームってなに？</h2>
     <p>
@@ -97,19 +102,24 @@
     </ul>
   </div>
 
-  <div class="controls">
-    <input type="range" id="cellSizeSlider" min="10" max="50" value="10" />
-    <span id="cellSizeLabel">30</span>
-    <button id="toggle">⏸️ とめる</button>
-    <button onclick="previousGeneration()">◀️ 1サイクル戻す</button>
-    <button onclick="stepGeneration()">▶️ 1サイクル進める</button>
-    <button onclick="placePattern('glider')">🛸 グライダー</button>
-    <button onclick="placePattern('blinker')">🔁 ブリンカー</button>
-    <button onclick="placePattern('block')">⬛ ブロック</button>
-    <button onclick="placePattern('pulsar')">🌸 パルサー</button>
-    <button onclick="placePattern('lwss')">🚀 LWSS</button>
-    <button onclick="placePattern('glidergun')">🔫 グライダーガン</button>
-    <button onclick="clearField()">🧹 けす</button>
+  <div class="controls" style="display: flex; justify-content: space-between; width: 90%; max-width: 700px;">
+    <div class="control-row" style="display: flex; align-items: center; gap: 0.5em;">
+        <input type="range" id="cellSizeSlider" min="10" max="50" value="10" />
+        <span id="cellSizeLabel">30</span>
+        <button onclick="previousGeneration()" title="巻き戻し">⏮️</button>
+      <button id="stop" title="とめる">⏸️</button>
+      <button id="start" title="うごかす">▶️</button>
+      <button onclick="clearField()" title="消す">⏹️</button>
+      <button onclick="stepGeneration()" title="早送り">⏩</button>
+    </div>
+    <div class="pattern-row">
+      <button onclick="placePattern('glider')">🛸 グライダー</button>
+      <button onclick="placePattern('blinker')">🔁 ブリンカー</button>
+      <button onclick="placePattern('block')">⬛ ブロック</button>
+      <button onclick="placePattern('pulsar')">🌸 パルサー</button>
+      <button onclick="placePattern('lwss')">🚀 LWSS</button>
+      <button onclick="placePattern('glidergun')">🔫 グライダーガン</button>
+    </div>
   </div>
 
   <!-- キャンバスは p5.js が自動生成 -->

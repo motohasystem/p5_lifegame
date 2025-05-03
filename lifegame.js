@@ -1,11 +1,11 @@
 // lifegame.js
 window.addEventListener("DOMContentLoaded", () => {
-    const title = document.createElement("h1");
-    title.textContent = "🌱 ライフゲーム：はたらく細胞のアルゴリズム";
-    title.style.fontSize = "2em";
-    title.style.marginTop = "0.5em";
-    title.style.textAlign = "center";
-    document.body.insertBefore(title, document.body.firstChild);
+    // const title = document.createElement("h1");
+    // title.textContent = "🌱 ライフゲーム：はたらく細胞のアルゴリズム";
+    // title.style.fontSize = "2em";
+    // title.style.marginTop = "0.5em";
+    // title.style.textAlign = "center";
+    // document.body.insertBefore(title, document.body.firstChild);
 
     // ルール開閉ボタン対策（遅延防止）
     const ruleToggle = document.getElementById("rule-toggle");
@@ -21,9 +21,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const slider = document.getElementById("cellSizeSlider");
     const label = document.getElementById("cellSizeLabel");
-    const toggleButton = document.getElementById("toggle");
+    const stopButton = document.getElementById("stop");
+    const startButton = document.getElementById("start");
 
-    if (!slider || !label || !toggleButton) {
+    if (!slider || !label || !stopButton || !startButton) {
         console.error(
             "必要なDOM要素が見つかりませんでした。HTMLの読み込み順を確認してください。"
         );
@@ -48,11 +49,15 @@ window.addEventListener("DOMContentLoaded", () => {
             updateCanvas();
             p.frameRate(10);
 
-            toggleButton.addEventListener("click", () => {
-                running = !running;
-                toggleButton.textContent = running
-                    ? "⏸️ とめる"
-                    : "▶️ うごかす";
+            const stopButton = document.getElementById("stop");
+            const startButton = document.getElementById("start");
+
+            stopButton.addEventListener("click", () => {
+                running = false;
+            });
+
+            startButton.addEventListener("click", () => {
+                running = true;
             });
 
             slider.addEventListener("input", () => {
