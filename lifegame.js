@@ -65,6 +65,15 @@ window.addEventListener("DOMContentLoaded", () => {
                 updateCanvasSize();
                 updateCanvas();
             });
+
+            // カーソルキーで1サイクル進める/戻すをトリガー
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "ArrowRight") {
+                    window.stepGeneration();
+                } else if (e.key === "ArrowLeft") {
+                    window.previousGeneration();
+                }
+            });
         };
 
         function updateCanvasSize() {
