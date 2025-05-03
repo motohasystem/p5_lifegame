@@ -98,9 +98,11 @@
   </div>
 
   <div class="controls">
-    <input type="range" id="cellSizeSlider" min="10" max="30" value="10" />
+    <input type="range" id="cellSizeSlider" min="10" max="50" value="10" />
     <span id="cellSizeLabel">30</span>
     <button id="toggle">⏸️ とめる</button>
+    <button onclick="previousGeneration()">◀️ 1サイクル戻す</button>
+    <button onclick="stepGeneration()">▶️ 1サイクル進める</button>
     <button onclick="placePattern('glider')">🛸 グライダー</button>
     <button onclick="placePattern('blinker')">🔁 ブリンカー</button>
     <button onclick="placePattern('block')">⬛ ブロック</button>
