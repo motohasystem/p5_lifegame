@@ -100,6 +100,22 @@ window.addEventListener("DOMContentLoaded", () => {
                 drawGrid();
             }
             drawCells();
+            if (cellSize >= 40) {
+                // 次のステップで生まれる細胞と死ぬ細胞を計算（描画用）
+                const { bornCells, dieCells } = calculateNextChanges();
+                // 生まれる細胞を緑で描画
+                p.fill(0, 255, 0, 150);
+                for (let pos of bornCells) {
+                    let [x, y] = pos.split(",").map(Number);
+                    p.rect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+                // 死ぬ細胞を赤で描画
+                p.fill(255, 0, 0, 150);
+                for (let pos of dieCells) {
+                    let [x, y] = pos.split(",").map(Number);
+                    p.rect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
             if (running) {
                 saveHistory();
                 nextGeneration();
@@ -140,7 +156,7 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        function nextGeneration() {
+        function calculateNextChanges() {
             let neighborCounts = new Map();
             for (let pos of liveCells) {
                 let [x, y] = pos.split(",").map(Number);
@@ -158,6 +174,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 }
             }
             let newLiveCells = new Set();
+            let bornCells = new Set();
+            let dieCells = new Set();
+            // 生存判定と変化判定
             for (let [key, count] of neighborCounts.entries()) {
                 let alive = liveCells.has(key);
                 if (
@@ -165,7 +184,34 @@ window.addEventListener("DOMContentLoaded", () => {
                     (!alive && count === 3)
                 ) {
                     newLiveCells.add(key);
+                    if (!alive) {
+                        bornCells.add(key);
+                    }
+                } else {
+                    if (alive) {
+                        dieCells.add(key);
+                    }
                 }
+            }
+            // liveCellsに存在してneighborCountsにない細胞は死ぬ
+            for (let pos of liveCells) {
+                if (!neighborCounts.has(pos)) {
+                    dieCells.add(pos);
+                }
+            }
+            return { bornCells, dieCells };
+        }
+
+        function nextGeneration() {
+            const { bornCells, dieCells } = calculateNextChanges();
+            let newLiveCells = new Set([...liveCells]);
+            // 生まれる細胞を追加
+            for (let pos of bornCells) {
+                newLiveCells.add(pos);
+            }
+            // 死ぬ細胞を削除
+            for (let pos of dieCells) {
+                newLiveCells.delete(pos);
             }
             liveCells = newLiveCells;
         }
