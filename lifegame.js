@@ -96,12 +96,27 @@ window.addEventListener("DOMContentLoaded", () => {
 
         p.draw = () => {
             p.background(220);
+            if (cellSize >= 40) {
+                drawGrid();
+            }
             drawCells();
             if (running) {
                 saveHistory();
                 nextGeneration();
             }
         };
+
+        function drawGrid() {
+            p.stroke(180);
+            p.strokeWeight(1);
+            for (let x = 0; x <= cols; x++) {
+                p.line(x * cellSize, 0, x * cellSize, rows * cellSize);
+            }
+            for (let y = 0; y <= rows; y++) {
+                p.line(0, y * cellSize, cols * cellSize, y * cellSize);
+            }
+            p.noStroke();
+        }
 
         function drawCells() {
             p.fill(0);
@@ -185,7 +200,10 @@ window.addEventListener("DOMContentLoaded", () => {
         p.mousePressed = () => toggleCellUnderMouse();
         p.mouseDragged = () => toggleCellUnderMouse();
 
-        window.clearField = () => liveCells.clear();
+        window.clearField = () => {
+            liveCells.clear();
+            running = false;
+        };
 
         window.placePattern = (name) => {
             const cx = Math.floor(cols / 2);
