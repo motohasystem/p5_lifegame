@@ -39,6 +39,12 @@
       flex-direction: column;
       align-items: center;
     }
+    .pattern-row {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 0.5em;
+    }
     canvas {
       border: 1px solid #ccc;
       margin-top: 1em;
@@ -47,6 +53,7 @@
       margin: 0.2em;
       padding: 0.5em 1em;
       font-size: 16px;
+      white-space: nowrap;
     }
     .rule-svg {
       margin: 0.5em 0;
