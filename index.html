@@ -161,8 +161,20 @@
 
   <div class="controls" style="display: flex; justify-content: space-between; width: 90%; max-width: 700px;">
     <div class="control-row" style="display: flex; align-items: center; gap: 0.5em;">
-        <input type="range" id="cellSizeSlider" min="10" max="50" value="10" />
-        <span id="cellSizeLabel">30</span>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <label style="font-size: 12px;">セルサイズ</label>
+          <div style="display: flex; align-items: center; gap: 0.5em;">
+            <input type="range" id="cellSizeSlider" min="10" max="50" value="10" />
+            <span id="cellSizeLabel">30</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <label style="font-size: 12px;">速度</label>
+          <div style="display: flex; align-items: center; gap: 0.5em;">
+            <input type="range" id="speedSlider" min="1" max="60" value="10" />
+            <span id="speedLabel">10</span>
+          </div>
+        </div>
         <button onclick="previousGeneration()" title="巻き戻し">⏮️</button>
       <button id="stop" title="とめる">⏸️</button>
       <button id="start" title="うごかす">▶️</button>

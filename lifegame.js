@@ -21,10 +21,12 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const slider = document.getElementById("cellSizeSlider");
     const label = document.getElementById("cellSizeLabel");
+    const speedSlider = document.getElementById("speedSlider");
+    const speedLabel = document.getElementById("speedLabel");
     const stopButton = document.getElementById("stop");
     const startButton = document.getElementById("start");
 
-    if (!slider || !label || !stopButton || !startButton) {
+    if (!slider || !label || !speedSlider || !speedLabel || !stopButton || !startButton) {
         console.error(
             "必要なDOM要素が見つかりませんでした。HTMLの読み込み順を確認してください。"
         );
@@ -47,12 +49,18 @@ window.addEventListener("DOMContentLoaded", () => {
         let generation = 0;
         let populationHistory = [];
         const maxPopulationHistory = 200;
+        let lastGraphUpdate = 0;
+        const graphUpdateInterval = 500; // 0.5秒ごとにグラフを更新
+        
+        // 速度制御用
+        let frameRate = parseInt(speedSlider.value || "10");
 
         p.setup = () => {
             label.textContent = cellSize;
+            speedLabel.textContent = frameRate;
             updateCanvasSize();
             updateCanvas();
-            p.frameRate(10);
+            p.frameRate(frameRate);
 
             const stopButton = document.getElementById("stop");
             const startButton = document.getElementById("start");
@@ -69,6 +77,12 @@ window.addEventListener("DOMContentLoaded", () => {
                 cellSize = parseInt(slider.value);
                 label.textContent = cellSize;
                 updateCanvas();
+            });
+            
+            speedSlider.addEventListener("input", () => {
+                frameRate = parseInt(speedSlider.value);
+                speedLabel.textContent = frameRate;
+                p.frameRate(frameRate);
             });
 
             window.addEventListener("resize", () => {
@@ -107,8 +121,8 @@ window.addEventListener("DOMContentLoaded", () => {
                 drawGrid();
             }
             drawCells();
-            if (cellSize >= 40) {
-                // 次のステップで生まれる細胞と死ぬ細胞を計算（描画用）
+            if (cellSize >= 40 && !running) {
+                // 停止中のみ次のステップで生まれる細胞と死ぬ細胞を計算（描画用）
                 const { bornCells, dieCells } = calculateNextChanges();
                 // 生まれる細胞を緑で描画
                 p.fill(0, 255, 0, 150);
@@ -168,11 +182,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
         function calculateNextChanges() {
             let neighborCounts = new Map();
+            // 生きている細胞の周囲だけをチェック
             for (let pos of liveCells) {
                 let [x, y] = pos.split(",").map(Number);
+                // 8近傍を正しくチェック
                 for (let dx = -1; dx <= 1; dx++) {
                     for (let dy = -1; dy <= 1; dy++) {
-                        if (dx === 0 && dy === 0) continue;
+                        if (dx === 0 && dy === 0) continue; // 中心はスキップ
+                        
                         let nx = mod(x + dx, cols);
                         let ny = mod(y + dy, rows);
                         let key = `${nx},${ny}`;
@@ -423,8 +440,12 @@ window.addEventListener("DOMContentLoaded", () => {
                 populationHistory.shift();
             }
             
-            // グラフを描画
-            drawPopulationGraph();
+            // グラフを一定間隔で描画（パフォーマンス向上）
+            const now = Date.now();
+            if (now - lastGraphUpdate > graphUpdateInterval || !running) {
+                drawPopulationGraph();
+                lastGraphUpdate = now;
+            }
         }
 
         // 人口グラフを描画する関数
