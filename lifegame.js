@@ -43,6 +43,11 @@ window.addEventListener("DOMContentLoaded", () => {
         let history = [];
         const maxHistory = 100;
 
+        // 統計情報用
+        let generation = 0;
+        let populationHistory = [];
+        const maxPopulationHistory = 200;
+
         p.setup = () => {
             label.textContent = cellSize;
             updateCanvasSize();
@@ -92,6 +97,8 @@ window.addEventListener("DOMContentLoaded", () => {
             if (canvas) canvas.remove();
             canvas = p.createCanvas(cols * cellSize, rows * cellSize);
             canvas.parent(document.body);
+            // canvasにIDを追加してチュートリアルでハイライトできるようにする
+            canvas.canvas.id = "lifegame-canvas";
         }
 
         p.draw = () => {
@@ -120,6 +127,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 saveHistory();
                 nextGeneration();
             }
+            
+            // 統計情報を更新
+            updateStats();
         };
 
         function drawGrid() {
@@ -214,12 +224,14 @@ window.addEventListener("DOMContentLoaded", () => {
                 newLiveCells.delete(pos);
             }
             liveCells = newLiveCells;
+            generation++;
         }
 
         // ステップ実行用にnextGenerationを外部公開
         window.stepGeneration = () => {
             saveHistory();
             nextGeneration();
+            updateStats();
         };
 
         // 1サイクル戻す関数を外部公開
@@ -228,6 +240,12 @@ window.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             liveCells = history.pop();
+            generation = Math.max(0, generation - 1);
+            // 人口履歴も戻す
+            if (populationHistory.length > 1) {
+                populationHistory.pop();
+            }
+            updateStats();
         };
 
         function toggleCellUnderMouse() {
@@ -249,6 +267,10 @@ window.addEventListener("DOMContentLoaded", () => {
         window.clearField = () => {
             liveCells.clear();
             running = false;
+            generation = 0;
+            populationHistory = [];
+            updateStats();
+            drawPopulationGraph();
         };
 
         window.placePattern = (name) => {
@@ -389,5 +411,75 @@ window.addEventListener("DOMContentLoaded", () => {
                 );
             }
         };
+
+        // 統計情報を更新する関数
+        function updateStats() {
+            document.getElementById("generation-count").textContent = generation;
+            document.getElementById("cell-count").textContent = liveCells.size;
+            
+            // 人口履歴を記録
+            populationHistory.push(liveCells.size);
+            if (populationHistory.length > maxPopulationHistory) {
+                populationHistory.shift();
+            }
+            
+            // グラフを描画
+            drawPopulationGraph();
+        }
+
+        // 人口グラフを描画する関数
+        function drawPopulationGraph() {
+            const canvas = document.getElementById("population-graph");
+            const ctx = canvas.getContext("2d");
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // キャンバスをクリア
+            ctx.clearRect(0, 0, width, height);
+            
+            // 背景
+            ctx.fillStyle = "#f8f8f8";
+            ctx.fillRect(0, 0, width, height);
+            
+            if (populationHistory.length < 2) return;
+            
+            // 最大値を見つける
+            const maxPop = Math.max(...populationHistory, 10);
+            
+            // グラフを描画
+            ctx.strokeStyle = "#4CAF50";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            populationHistory.forEach((pop, i) => {
+                const x = (i / (maxPopulationHistory - 1)) * width;
+                const y = height - (pop / maxPop) * height * 0.8 - height * 0.1;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+            
+            // 軸とラベル
+            ctx.strokeStyle = "#333";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, height - 10);
+            ctx.lineTo(width, height - 10);
+            ctx.stroke();
+            
+            // 現在の細胞数を表示
+            ctx.fillStyle = "#333";
+            ctx.font = "14px sans-serif";
+            ctx.textAlign = "right";
+            ctx.fillText(`現在: ${liveCells.size}`, width - 10, 20);
+        }
+
+        // 初期化時に統計情報を更新
+        updateStats();
     });
 });

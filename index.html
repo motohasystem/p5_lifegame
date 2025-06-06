@@ -59,6 +59,55 @@
     .rule-svg {
       margin: 0.5em 0;
     }
+    .stats-container {
+      width: 90%;
+      max-width: 700px;
+    }
+    .stat-item {
+      font-size: 18px;
+    }
+    #population-graph {
+      width: 90%;
+      max-width: 700px;
+    }
+    
+    /* チュートリアル用のスタイル */
+    .tutorial-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      z-index: 1000;
+    }
+    .tutorial-box {
+      position: absolute;
+      background: white;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1002;
+    }
+    .tutorial-box h2 {
+      margin-top: 0;
+    }
+    .tutorial-buttons {
+      margin-top: 1.5em;
+      display: flex;
+      gap: 1em;
+      justify-content: flex-end;
+    }
+    .highlight-tutorial {
+      box-shadow: 0 0 20px 5px rgba(255, 255, 0, 0.8);
+      position: relative;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
@@ -130,12 +179,134 @@
     </div>
   </div>
 
+  <!-- 統計情報表示エリア -->
+  <div class="stats-container" style="display: flex; gap: 2em; align-items: center; margin-top: 1em;">
+    <div class="stat-item">
+      <span style="font-weight: bold;">🔢 世代:</span>
+      <span id="generation-count">0</span>
+    </div>
+    <div class="stat-item">
+      <span style="font-weight: bold;">🦠 生きている細胞:</span>
+      <span id="cell-count">0</span>
+    </div>
+    <button id="tutorial-btn" onclick="startTutorial()" style="margin-left: auto;">📚 チュートリアル</button>
+  </div>
+
+  <!-- 人口グラフ -->
+  <canvas id="population-graph" width="700" height="150" style="border: 1px solid #ccc; margin-top: 1em; display: block;"></canvas>
+
   <!-- キャンバスは p5.js が自動生成 -->
+
+  <!-- チュートリアルオーバーレイ -->
+  <div class="tutorial-overlay" id="tutorial-overlay">
+    <div class="tutorial-box" id="tutorial-box">
+      <h2 id="tutorial-title">ようこそ！</h2>
+      <p id="tutorial-content">ライフゲームのチュートリアルを始めましょう！</p>
+      <div class="tutorial-buttons">
+        <button onclick="prevTutorialStep()">前へ</button>
+        <button onclick="nextTutorialStep()">次へ</button>
+        <button onclick="endTutorial()">終了</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     function toggleDescription() {
       const desc = document.getElementById("description");
       desc.style.display = desc.style.display === "none" ? "block" : "none";
+    }
+    
+    // チュートリアル関連の変数
+    let tutorialStep = 0;
+    const tutorialSteps = [
+      {
+        title: "ようこそ！ライフゲームの世界へ",
+        content: "これからライフゲームの遊び方を説明します。<br>ライフゲームは、細胞が生まれたり死んだりする様子を観察するゲームです。",
+        highlight: null
+      },
+      {
+        title: "細胞を置いてみよう",
+        content: "画面の白い部分をクリックすると、黒い細胞を置くことができます。<br>もう一度クリックすると消えます。試してみましょう！",
+        highlight: "#lifegame-canvas"
+      },
+      {
+        title: "細胞のルール",
+        content: "細胞には3つのルールがあります：<br>1. 周りに3つの細胞があると生まれる<br>2. 周りに2〜3個の細胞があると生き残る<br>3. それ以外は死んでしまう",
+        highlight: null
+      },
+      {
+        title: "シミュレーションを動かそう",
+        content: "▶️ボタンを押すと、細胞が動き始めます。<br>⏸️ボタンで止めることもできます。",
+        highlight: "#start"
+      },
+      {
+        title: "パターンを試そう",
+        content: "下のボタンから、有名なパターンを選んで配置できます。<br>「グライダー」を試してみましょう！",
+        highlight: ".pattern-row"
+      },
+      {
+        title: "統計を見てみよう",
+        content: "画面上部には、何世代目かと、生きている細胞の数が表示されます。<br>下のグラフでは、細胞数の変化を見ることができます。",
+        highlight: ".stats-container"
+      },
+      {
+        title: "さあ、始めましょう！",
+        content: "これでチュートリアルは終了です。<br>いろいろなパターンを試して、生命の不思議な動きを観察してみましょう！",
+        highlight: null
+      }
+    ];
+    
+    function startTutorial() {
+      tutorialStep = 0;
+      document.getElementById("tutorial-overlay").style.display = "block";
+      showTutorialStep();
+    }
+    
+    function showTutorialStep() {
+      const step = tutorialSteps[tutorialStep];
+      document.getElementById("tutorial-title").textContent = step.title;
+      document.getElementById("tutorial-content").innerHTML = step.content;
+      
+      // 既存のハイライトを削除
+      document.querySelectorAll(".highlight-tutorial").forEach(el => {
+        el.classList.remove("highlight-tutorial");
+      });
+      
+      // 新しいハイライトを追加
+      if (step.highlight) {
+        const element = document.querySelector(step.highlight);
+        if (element) {
+          element.classList.add("highlight-tutorial");
+        }
+      }
+      
+      // ボタンの状態を更新
+      const prevBtn = document.querySelector(".tutorial-buttons button:first-child");
+      prevBtn.disabled = tutorialStep === 0;
+      prevBtn.style.opacity = tutorialStep === 0 ? "0.5" : "1";
+    }
+    
+    function nextTutorialStep() {
+      if (tutorialStep < tutorialSteps.length - 1) {
+        tutorialStep++;
+        showTutorialStep();
+      } else {
+        endTutorial();
+      }
+    }
+    
+    function prevTutorialStep() {
+      if (tutorialStep > 0) {
+        tutorialStep--;
+        showTutorialStep();
+      }
+    }
+    
+    function endTutorial() {
+      document.getElementById("tutorial-overlay").style.display = "none";
+      document.querySelectorAll(".highlight-tutorial").forEach(el => {
+        el.classList.remove("highlight-tutorial");
+      });
     }
   </script>
    <script src="lifegame.js" defer></script>
