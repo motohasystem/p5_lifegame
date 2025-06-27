@@ -111,9 +111,14 @@
   </style>
 </head>
 <body>
-  <div style="display: flex; align-items: center; justify-content: center; gap: 1em; margin-top: 0.5em;">
-    <h1 style="font-size: 2em; margin: 0;">🌱 ライフゲーム：はたらく細胞のアルゴリズム</h1>
+  <h1 style="font-size: 2em; margin: 0.5em 0; text-align: center;">🌱 ライフゲーム：はたらく細胞のアルゴリズム</h1>
+  
+  <!-- 4つのメインボタン -->
+  <div style="display: flex; justify-content: center; gap: 1em; margin: 1em 0; flex-wrap: wrap;">
     <button id="rule-toggle" class="description-toggle" onclick="toggleDescription()">📘 ルールをひらく / とじる</button>
+    <button id="controls-toggle" class="description-toggle" onclick="toggleControls()">🎮 コントロールをひらく / とじる</button>
+    <button id="stats-toggle" class="description-toggle" onclick="toggleStats()">📊 統計情報をひらく / とじる</button>
+    <button id="tutorial-btn" class="description-toggle" onclick="startTutorial()">📚 チュートリアル</button>
   </div>
   <div class="description" id="description"  style="display: none;">
     <h2>ライフゲームってなに？</h2>
@@ -159,7 +164,7 @@
     </ul>
   </div>
 
-  <div class="controls" style="display: flex; justify-content: space-between; width: 90%; max-width: 700px;">
+  <div id="controls-display" class="controls" style="display: flex; justify-content: space-between; width: 90%; max-width: 700px;">
     <div class="control-row" style="display: flex; align-items: center; gap: 0.5em;">
         <div style="display: flex; flex-direction: column; align-items: center;">
           <label style="font-size: 12px;">セルサイズ</label>
@@ -192,7 +197,8 @@
   </div>
 
   <!-- 統計情報表示エリア -->
-  <div class="stats-container" style="display: flex; gap: 2em; align-items: center; margin-top: 1em;">
+  
+  <div id="stats-display" class="stats-container" style="display: none; gap: 2em; align-items: center; margin-top: 1em;">
     <div class="stat-item">
       <span style="font-weight: bold;">🔢 世代:</span>
       <span id="generation-count">0</span>
@@ -201,11 +207,10 @@
       <span style="font-weight: bold;">🦠 生きている細胞:</span>
       <span id="cell-count">0</span>
     </div>
-    <button id="tutorial-btn" onclick="startTutorial()" style="margin-left: auto;">📚 チュートリアル</button>
   </div>
 
   <!-- 人口グラフ -->
-  <canvas id="population-graph" width="700" height="150" style="border: 1px solid #ccc; margin-top: 1em; display: block;"></canvas>
+  <canvas id="population-graph" width="700" height="150" style="border: 1px solid #ccc; margin-top: 1em; display: none;"></canvas>
 
   <!-- キャンバスは p5.js が自動生成 -->
 
@@ -226,6 +231,29 @@
     function toggleDescription() {
       const desc = document.getElementById("description");
       desc.style.display = desc.style.display === "none" ? "block" : "none";
+    }
+    
+    function toggleStats() {
+      const statsDisplay = document.getElementById("stats-display");
+      const populationGraph = document.getElementById("population-graph");
+      
+      if (statsDisplay.style.display === "none") {
+        statsDisplay.style.display = "flex";
+        populationGraph.style.display = "block";
+      } else {
+        statsDisplay.style.display = "none";
+        populationGraph.style.display = "none";
+      }
+    }
+    
+    function toggleControls() {
+      const controlsDisplay = document.getElementById("controls-display");
+      
+      if (controlsDisplay.style.display === "none") {
+        controlsDisplay.style.display = "flex";
+      } else {
+        controlsDisplay.style.display = "none";
+      }
     }
     
     // チュートリアル関連の変数
