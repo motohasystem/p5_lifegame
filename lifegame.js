@@ -110,7 +110,7 @@ window.addEventListener("DOMContentLoaded", () => {
             rows = Math.floor(canvasHeight / cellSize);
             if (canvas) canvas.remove();
             canvas = p.createCanvas(cols * cellSize, rows * cellSize);
-            canvas.parent(document.body);
+            canvas.parent("lifegame-canvas-container");
             // canvasにIDを追加してチュートリアルでハイライトできるようにする
             canvas.canvas.id = "lifegame-canvas";
         }
@@ -140,10 +140,9 @@ window.addEventListener("DOMContentLoaded", () => {
             if (running) {
                 saveHistory();
                 nextGeneration();
+                // 再生中のみ統計情報を更新
+                updateStats();
             }
-            
-            // 統計情報を更新
-            updateStats();
         };
 
         function drawGrid() {
@@ -434,17 +433,19 @@ window.addEventListener("DOMContentLoaded", () => {
             document.getElementById("generation-count").textContent = generation;
             document.getElementById("cell-count").textContent = liveCells.size;
             
-            // 人口履歴を記録
-            populationHistory.push(liveCells.size);
-            if (populationHistory.length > maxPopulationHistory) {
-                populationHistory.shift();
-            }
-            
-            // グラフを一定間隔で描画（パフォーマンス向上）
-            const now = Date.now();
-            if (now - lastGraphUpdate > graphUpdateInterval || !running) {
-                drawPopulationGraph();
-                lastGraphUpdate = now;
+            // 再生中のみ人口履歴を記録しグラフを更新
+            if (running) {
+                populationHistory.push(liveCells.size);
+                if (populationHistory.length > maxPopulationHistory) {
+                    populationHistory.shift();
+                }
+                
+                // グラフを一定間隔で描画（パフォーマンス向上）
+                const now = Date.now();
+                if (now - lastGraphUpdate > graphUpdateInterval) {
+                    drawPopulationGraph();
+                    lastGraphUpdate = now;
+                }
             }
         }
 
