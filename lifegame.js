@@ -121,8 +121,8 @@ window.addEventListener("DOMContentLoaded", () => {
                 drawGrid();
             }
             drawCells();
-            if (cellSize >= 40 && !running) {
-                // 停止中のみ次のステップで生まれる細胞と死ぬ細胞を計算（描画用）
+            if (cellSize >= 40) {
+                // 次のステップで生まれる細胞と死ぬ細胞を計算（描画用）
                 const { bornCells, dieCells } = calculateNextChanges();
                 // 生まれる細胞を緑で描画
                 p.fill(0, 255, 0, 150);
